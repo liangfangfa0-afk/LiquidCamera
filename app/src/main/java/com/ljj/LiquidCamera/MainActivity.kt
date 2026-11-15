@@ -275,7 +275,7 @@ private fun savePhoto(
     context: android.content.Context,
     capture: ImageCapture,
     onSaved: () -> Unit,
-    onError: () -> Unit
+    onFailure: () -> Unit
 ) {
     val filename = "LiquidCamera_" + SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date()) + ".jpg"
     val values = ContentValues().apply {
@@ -292,7 +292,7 @@ private fun savePhoto(
 
     val uri = context.contentResolver.insert(collection, values)
     if (uri == null) {
-        onError()
+        onFailure()
         return
     }
     val output = ImageCapture.OutputFileOptions.Builder(context.contentResolver, uri, values).build()
@@ -306,7 +306,7 @@ private fun savePhoto(
         }
         override fun onError(exception: ImageCaptureException) {
             context.contentResolver.delete(uri, null, null)
-            onError()
+            onFailure()
         }
     })
 }
