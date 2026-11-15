@@ -47,7 +47,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
@@ -297,17 +296,17 @@ private fun savePhoto(
         return
     }
     val output = ImageCapture.OutputFileOptions.Builder(context.contentResolver, uri, values).build()
-    capture.takePicture(output, Executors.newSingleThreadExecutor(), object : ImageCapture.OnImageSavedCallback {
+    capture.takePicture(output, ContextCompat.getMainExecutor(context), object : ImageCapture.OnImageSavedCallback {
         override fun onImageSaved(result: ImageCapture.OutputFileResults) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 val ready = ContentValues().apply { put(MediaStore.Images.Media.IS_PENDING, 0) }
                 context.contentResolver.update(uri, ready, null, null)
             }
-            ContextCompat.getMainExecutor(context).execute(onSaved)
+            onSaved()
         }
         override fun onError(exception: ImageCaptureException) {
             context.contentResolver.delete(uri, null, null)
-            ContextCompat.getMainExecutor(context).execute(onError)
+            onError()
         }
     })
 }
