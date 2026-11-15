@@ -1,0 +1,1 @@
+# LiquidCamera ProGuard rules.
